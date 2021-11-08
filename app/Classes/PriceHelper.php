@@ -75,6 +75,15 @@ class PriceHelper
      */
     public static function getPriceAtEachQty(array $qtyArr, array $tiers, bool $cumulative = false): array
     {
-       return [];
+        $totalQty = 0;
+        $monthlyTotal = [];
+        foreach ($qtyArr as $key => $qty)
+        {
+            if ($cumulative) $totalQty += $qty;
+            else $totalQty = $qty;
+            // use back the same key. So if the array of qty is in assoc array, it returns the month's name, else it just uses back the index.
+            $monthlyTotal[$key] = self::getTotalPriceTierAtQty($totalQty,$tiers);
+        }
+        return $monthlyTotal;
     }
 }
