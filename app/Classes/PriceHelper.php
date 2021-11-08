@@ -32,7 +32,6 @@ class PriceHelper
 
         if ($qty == 0) return 0.0;
 
-        // foreach ($filteredTiers as $key => $value)
         for ($i = 0; $i < count($filteredTiers); $i++)
         {
             // if by the time reach the last tier, it has passed all tiers. use last value.
@@ -59,8 +58,54 @@ class PriceHelper
      */
     public static function getTotalPriceTierAtQty(int $qty, array $tiers): float
     {
-        $unitPrice = self::getUnitPriceTierAtQty($qty,$tiers);
-        return $unitPrice*$qty;
+        if ($qty == 0) return 0.0;
+
+        $total = 0.0;
+        // non-numberic keys could break this. Removing non-numric keys in the tiers array
+        $filteredTiers = array_filter($tiers, function ($k) { return is_numeric($k); }, ARRAY_FILTER_USE_KEY);
+        // this method only works if tier is sorted by lowest to highest by default.
+        ksort($filteredTiers);
+
+        for ($i = 0; $i < count($filteredTiers); $i++)
+        {
+            if ($qty >= array_keys($filteredTiers)[$i])
+            {
+                if ($i == count($filteredTiers)-1)
+                {
+                    $total += ($qty - (array_keys($filteredTiers)[$i] -1)) * array_values($filteredTiers)[$i];
+                }
+                else if ($qty >= array_keys($filteredTiers)[$i+1])
+                {
+                    if ($i == 0)
+                    {
+                        $total += (array_keys($filteredTiers)[$i+1] -1) * array_values($filteredTiers)[$i];
+                    }
+                    else
+                    {
+                        $total += ((array_keys($filteredTiers)[$i+1] -1) - (array_keys($filteredTiers)[$i] -1)) * array_values($filteredTiers)[$i];
+                    }
+                }
+                else
+                {
+                    if ($i == 0)
+                    {
+                        $total += $qty * array_values($filteredTiers)[$i];
+                    }
+                    else
+                    {
+                        $total += ($qty - (array_keys($filteredTiers)[$i] -1)) * array_values($filteredTiers)[$i];
+                    }
+                }
+            }
+        }
+
+        // for ($i = 0; $i <= $qty; $i++)
+        // {
+        //     $unitPrice = self::getUnitPriceTierAtQty($i,$tiers);
+        //     $total += $unitPrice;
+        // }
+
+        return $total;
     }
 
     /**
