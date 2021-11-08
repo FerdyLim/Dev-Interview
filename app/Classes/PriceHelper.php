@@ -30,15 +30,19 @@ class PriceHelper
         // this method only works if tier is sorted by lowest to highest by default.
         ksort($filteredTiers);
 
-        foreach ($filteredTiers as $key => $value)
+        if ($qty == 0) return 0.0;
+
+        // foreach ($filteredTiers as $key => $value)
+        for ($i = 0; $i < count($filteredTiers); $i++)
         {
-            // if qty is within range, or that this is the last entry (highest tier)
-            if ($qty < $key || array_search($key, array_keys($filteredTiers)) == count($filteredTiers)-1)
-            {
-                return $value;
-            }
+            // if by the time reach the last tier, it has passed all tiers. use last value.
+            if ($i == count($filteredTiers)-1) return array_values($filteredTiers)[$i];
+            $nextKey = array_keys($filteredTiers)[$i+1];
+            if ($qty < $nextKey) return array_values($filteredTiers)[$i];
         }
-        return 0.0;
+
+        // returns base price
+        return array_values($filteredTiers)[0];
     }
 
     /**
