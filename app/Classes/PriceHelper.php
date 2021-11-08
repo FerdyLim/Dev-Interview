@@ -55,7 +55,8 @@ class PriceHelper
      */
     public static function getTotalPriceTierAtQty(int $qty, array $tiers): float
     {
-        return 0.0;
+        $unitPrice = self::getUnitPriceTierAtQty($qty,$tiers);
+        return $unitPrice*$qty;
     }
 
     /**
