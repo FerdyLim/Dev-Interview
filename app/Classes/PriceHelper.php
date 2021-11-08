@@ -25,6 +25,19 @@ class PriceHelper
      */
     public static function getUnitPriceTierAtQty(int $qty, array $tiers): float
     {
+        // non-numberic keys could break this. Removing non-numric keys in the tiers array
+        $filteredTiers = array_filter($tiers, function ($k) { return is_numeric($k); }, ARRAY_FILTER_USE_KEY);
+        // this method only works if tier is sorted by lowest to highest by default.
+        ksort($filteredTiers);
+
+        foreach ($filteredTiers as $key => $value)
+        {
+            // if qty is within range, or that this is the last entry (highest tier)
+            if ($qty < $key || array_search($key, array_keys($filteredTiers)) == count($filteredTiers)-1)
+            {
+                return $value;
+            }
+        }
         return 0.0;
     }
 
