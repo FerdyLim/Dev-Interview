@@ -99,12 +99,6 @@ class PriceHelper
             }
         }
 
-        // for ($i = 0; $i <= $qty; $i++)
-        // {
-        //     $unitPrice = self::getUnitPriceTierAtQty($i,$tiers);
-        //     $total += $unitPrice;
-        // }
-
         return $total;
     }
 
@@ -131,7 +125,9 @@ class PriceHelper
             if ($cumulative) $totalQty += $qty;
             else $totalQty = $qty;
             // use back the same key. So if the array of qty is in assoc array, it returns the month's name, else it just uses back the index.
-            $monthlyTotal[$key] = self::getTotalPriceTierAtQty($totalQty,$tiers);
+            $thisMonthTotal = self::getTotalPriceTierAtQty($totalQty,$tiers);
+            if ($cumulative) $thisMonthTotal -= array_sum(array_values($monthlyTotal));
+            $monthlyTotal[$key] = $thisMonthTotal;
         }
         return $monthlyTotal;
     }
